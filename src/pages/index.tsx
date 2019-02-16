@@ -6,7 +6,36 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 
-class BlogIndex extends React.Component {
+import { WindowLocation } from "@reach/router"
+
+interface MarkdownEdge {
+  node: {
+    excerpt: string
+    fields: {
+      slug: string
+    }
+    frontmatter: {
+      title: string
+      date: string
+    }
+  }
+}
+
+interface IndexPageProps {
+  location: WindowLocation
+  data: {
+    site: {
+      siteMetadata: {
+        title: string
+      }
+    }
+    allMarkdownRemark: {
+      edges: Array<MarkdownEdge>
+    }
+  }
+}
+
+class BlogIndex extends React.Component<IndexPageProps> {
   render() {
     const { data } = this.props
     const siteTitle = data.site.siteMetadata.title

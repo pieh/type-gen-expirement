@@ -4,9 +4,24 @@ import { graphql } from "gatsby"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
-class NotFoundPage extends React.Component {
+import { WindowLocation } from "@reach/router"
+
+interface NotFoundPageProps {
+  location: WindowLocation
+  data: {
+    site: {
+      siteMetadata: {
+        title: string
+        test: string
+      }
+    }
+  }
+}
+
+class NotFoundPage extends React.Component<NotFoundPageProps> {
   render() {
     const { data } = this.props
+
     const siteTitle = data.site.siteMetadata.title
 
     return (

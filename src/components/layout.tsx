@@ -1,9 +1,17 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { Link } from "gatsby"
 
 import { rhythm, scale } from "../utils/typography"
 
-class Layout extends React.Component {
+import { WindowLocation } from "@reach/router"
+
+interface LayoutProps {
+  location: WindowLocation
+  title: string
+  children: ReactNode
+}
+
+class Layout extends React.Component<LayoutProps> {
   render() {
     const { location, title, children } = this.props
     const rootPath = `${__PATH_PREFIX__}/`
