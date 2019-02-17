@@ -1,6 +1,9 @@
 import React from "react"
 import Helmet from "react-helmet"
 import { StaticQuery, graphql } from "gatsby"
+import _get from "lodash.get"
+
+import { DefaultSEOQuery } from "../query-result-types/DefaultSEOQuery"
 
 interface SEOProps {
   description?: string
@@ -18,18 +21,24 @@ function SEO({
   title,
 }: SEOProps) {
   return (
-    <StaticQuery
+    <StaticQuery<DefaultSEOQuery>
       query={detailsQuery}
       render={data => {
         const metaDescription =
-          description || data.site.siteMetadata.description
+          description ||
+          _get(data, [`site`, `siteMetadata`, `description`]) ||
+          ``
         return (
           <Helmet
             htmlAttributes={{
               lang,
             }}
             title={title}
-            titleTemplate={`%s | ${data.site.siteMetadata.title}`}
+            titleTemplate={`%s | ${_get(data, [
+              `site`,
+              `siteMetadata`,
+              `title`,
+            ])}`}
             meta={[
               {
                 name: `description`,
@@ -53,7 +62,7 @@ function SEO({
               },
               {
                 name: `twitter:creator`,
-                content: data.site.siteMetadata.author,
+                content: _get(data, [`site`, `siteMetadata`, `author`]),
               },
               {
                 name: `twitter:title`,

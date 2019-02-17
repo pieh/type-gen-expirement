@@ -1,45 +1,27 @@
 import React from "react"
-import { Link, graphql } from "gatsby"
+import { Link, graphql, GatsbyPageComponent } from "gatsby"
+import _get from "lodash.get"
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 
-import { WindowLocation } from "@reach/router"
+import {
+  IndexQuery,
+  IndexQuery_allMarkdownRemark_edges,
+} from "../query-result-types/IndexQuery"
 
-interface MarkdownEdge {
-  node: {
-    excerpt: string
-    fields: {
-      slug: string
-    }
-    frontmatter: {
-      title: string
-      date: string
-    }
-  }
-}
-
-interface IndexPageProps {
-  location: WindowLocation
-  data: {
-    site: {
-      siteMetadata: {
-        title: string
-      }
-    }
-    allMarkdownRemark: {
-      edges: Array<MarkdownEdge>
-    }
-  }
-}
-
-class BlogIndex extends React.Component<IndexPageProps> {
+class BlogIndex extends React.Component<GatsbyPageComponent<IndexQuery>> {
   render() {
     const { data } = this.props
-    const siteTitle = data.site.siteMetadata.title
-    const posts = data.allMarkdownRemark.edges
+
+    const siteTitle = _get(data, ["site", "metadata", "title"], "")
+    const posts: IndexQuery_allMarkdownRemark_edges[] = _get(
+      data,
+      ["allMarkdownRemark", "edges"],
+      []
+    )
 
     return (
       <Layout location={this.props.location} title={siteTitle}>
@@ -49,20 +31,30 @@ class BlogIndex extends React.Component<IndexPageProps> {
         />
         <Bio />
         {posts.map(({ node }) => {
-          const title = node.frontmatter.title || node.fields.slug
+          const title =
+            _get(node, ["frontmatter", "title"]) ||
+            _get(node, ["fields", "slug"])
+
           return (
-            <div key={node.fields.slug}>
+            <div key={_get(node, ["fields", "slug"])}>
               <h3
                 style={{
                   marginBottom: rhythm(1 / 4),
                 }}
               >
-                <Link style={{ boxShadow: `none` }} to={node.fields.slug}>
+                <Link
+                  style={{ boxShadow: `none` }}
+                  to={_get(node, ["fields", "slug"])}
+                >
                   {title}
                 </Link>
               </h3>
-              <small>{node.frontmatter.date}</small>
-              <p dangerouslySetInnerHTML={{ __html: node.excerpt }} />
+              <small>{_get(node, ["fields", "date"])}</small>
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: _get(node, ["excerpt"]) || "",
+                }}
+              />
             </div>
           )
         })}
@@ -74,7 +66,7 @@ class BlogIndex extends React.Component<IndexPageProps> {
 export default BlogIndex
 
 export const pageQuery = graphql`
-  query {
+  query IndexQuery {
     site {
       siteMetadata {
         title

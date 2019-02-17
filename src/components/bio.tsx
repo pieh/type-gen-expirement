@@ -1,15 +1,21 @@
 import React from "react"
 import { StaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
+import _get from "lodash.get"
 
 import { rhythm } from "../utils/typography"
+import { BioQuery } from "../query-result-types/BioQuery"
 
 function Bio() {
   return (
-    <StaticQuery
+    <StaticQuery<BioQuery>
       query={bioQuery}
       render={data => {
-        const { author, social } = data.site.siteMetadata
+        if (!data.site || !data.site.siteMetadata) {
+          return null
+        }
+
+        const { siteMetadata } = data.site
         return (
           <div
             style={{
@@ -17,26 +23,39 @@ function Bio() {
               marginBottom: rhythm(2.5),
             }}
           >
-            <Image
-              fixed={data.avatar.childImageSharp.fixed}
-              alt={author}
-              style={{
-                marginRight: rhythm(1 / 2),
-                marginBottom: 0,
-                minWidth: 50,
-                borderRadius: `100%`,
-              }}
-              imgStyle={{
-                borderRadius: `50%`,
-              }}
-            />
+            {data.avatar &&
+              data.avatar.childImageSharp &&
+              data.avatar.childImageSharp.fixed && (
+                <Image
+                  fixed={data.avatar.childImageSharp.fixed}
+                  alt={_get(siteMetadata, [`author`]) || ``}
+                  style={{
+                    marginRight: rhythm(1 / 2),
+                    marginBottom: 0,
+                    minWidth: 50,
+                    borderRadius: `100%`,
+                  }}
+                  imgStyle={{
+                    borderRadius: `50%`,
+                  }}
+                />
+              )}
             <p>
-              Written by <strong>{author}</strong> who lives and works in San
-              Francisco building useful things.
-              {` `}
-              <a href={`https://twitter.com/${social.twitter}`}>
-                You should follow him on Twitter
-              </a>
+              Written by <strong>{_get(siteMetadata, ["author"])}</strong> who
+              lives and works in San Francisco building useful things.
+              {siteMetadata.social && siteMetadata.social.twitter && (
+                <React.Fragment>
+                  {` `}
+                  <a
+                    href={`https://twitter.com/${_get(siteMetadata, [
+                      `social`,
+                      `twitter`,
+                    ])}`}
+                  >
+                    You should follow him on Twitter
+                  </a>
+                </React.Fragment>
+              )}
             </p>
           </div>
         )

@@ -1,28 +1,17 @@
 import React from "react"
-import { graphql } from "gatsby"
+import { graphql, GatsbyPageComponent } from "gatsby"
+import _get from "lodash.get"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
-import { WindowLocation } from "@reach/router"
+import { NotFounQuery } from "../query-result-types/NotFounQuery"
 
-interface NotFoundPageProps {
-  location: WindowLocation
-  data: {
-    site: {
-      siteMetadata: {
-        title: string
-        test: string
-      }
-    }
-  }
-}
-
-class NotFoundPage extends React.Component<NotFoundPageProps> {
+class NotFoundPage extends React.Component<GatsbyPageComponent<NotFounQuery>> {
   render() {
     const { data } = this.props
 
-    const siteTitle = data.site.siteMetadata.title
+    const siteTitle = _get(data, [`site`, `siteMetadata`, `title`], "")
 
     return (
       <Layout location={this.props.location} title={siteTitle}>
@@ -37,7 +26,7 @@ class NotFoundPage extends React.Component<NotFoundPageProps> {
 export default NotFoundPage
 
 export const pageQuery = graphql`
-  query {
+  query NotFounQuery {
     site {
       siteMetadata {
         title
